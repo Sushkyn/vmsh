@@ -1,0 +1,31 @@
+#!/bin/bash -e
+
+command -v qemu-system-x86_64 > /dev/null 2>&1 || { echo >&2 "I require qemu-system-x86_64 but it's not installed. Install it. Aborting."; exit 1; }
+command -v qemu-img > /dev/null 2>&1 || { echo >&2 "I require qemu-img but it's not installed. Install it. Aborting."; exit 1; }
+
+
+usage() {
+  echo "Usage: $0 IMAGE"
+  echo "Example: $0 /path/to/image.{img,iso,qcow2}"
+  exit 1
+}
+
+if [ "$#" -ne 1 ]; then
+  usage
+fi
+
+IMAGE="$1"
+
+if [[ "$IMAGE" == *".img" ]] && [[ -f "$IMAGE" ]]; then
+  qemu-system-x86_64 -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "${IMAGE}"
+elif [[ "$IMAGE" == *".iso" ]] && [[ -f "$IMAGE" ]]; then
+  read -p "Enter name for image file (e.g. Arch): " IMAGE_NAME
+  read -p "Enter disk size (default: 20G): " DISK && [ ! "$DISK" ] && DISK="20G"
+  mkdir -p ./data
+  qemu-img create -f qcow2 "./data/${IMAGE_NAME}.img" "$DISK"
+  qemu-system-x86_64 -boot d -cdrom "${IMAGE}" -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "./data/${IMAGE_NAME}.img"
+elif [[ "$IMAGE" == *".qcow2" ]] && [[ -f "$IMAGE" ]]; then
+  qemu-system-x86_64 -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "${IMAGE}"
+else
+  usage
+fi
