@@ -20,7 +20,7 @@ IMAGE="$1"
 if [[ "$IMAGE" == *".img" ]] && [[ -f "$IMAGE" ]]; then
   qemu-system-x86_64 -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "${IMAGE}" &
   sleep 0.5
-  VNC_PORT=$(netstat -tuln | grep ':59[0-9][0-9][[:space:]]' | awk '{print $4}' | cut -d':' -f2 | awk 'NF' | tail -n1)
+  VNC_PORT=$(netstat -tuln | grep ':59[0-9][0-9][[:space:]]' | awk '{print $4}' | cut -d':' -f2 | awk 'NF' | head -n1)
   vncviewer localhost:"$VNC_PORT"
   pkill qemu
 elif [[ "$IMAGE" == *".iso" ]] && [[ -f "$IMAGE" ]]; then
@@ -30,13 +30,13 @@ elif [[ "$IMAGE" == *".iso" ]] && [[ -f "$IMAGE" ]]; then
   qemu-img create -f qcow2 "./data/${IMAGE_NAME}.img" "$DISK"
   qemu-system-x86_64 -boot d -cdrom "${IMAGE}" -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "./data/${IMAGE_NAME}.img" &
   sleep 0.5
-  VNC_PORT=$(netstat -tuln | grep ':59[0-9][0-9][[:space:]]' | awk '{print $4}' | cut -d':' -f2 | awk 'NF' | tail -n1)
+  VNC_PORT=$(netstat -tuln | grep ':59[0-9][0-9][[:space:]]' | awk '{print $4}' | cut -d':' -f2 | awk 'NF' | head -n1)
   vncviewer localhost:"$VNC_PORT"
   pkill qemu
 elif [[ "$IMAGE" == *".qcow2" ]] && [[ -f "$IMAGE" ]]; then
   qemu-system-x86_64 -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "${IMAGE}" &
   sleep 0.5
-  VNC_PORT=$(netstat -tuln | grep ':59[0-9][0-9][[:space:]]' | awk '{print $4}' | cut -d':' -f2 | awk 'NF' | tail -n1)
+  VNC_PORT=$(netstat -tuln | grep ':59[0-9][0-9][[:space:]]' | awk '{print $4}' | cut -d':' -f2 | awk 'NF' | head -n1)
   vncviewer localhost:"$VNC_PORT"
   pkill qemu
 else
