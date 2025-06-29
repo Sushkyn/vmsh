@@ -3,7 +3,7 @@
 [ ! -d /sys/firmware/efi ] && echo "System not booted in UEFI mode." && exit 1
 
 command -v netstat > /dev/null 2>&1 || { echo >&2 "I require net-tools but it's not installed. Install it. Aborting."; exit 1; }
-command -v qemu-system-x86_64 > /dev/null 2>&1 || { echo >&2 "I require qemu-system-x86_64 but it's not installed. Install it. Aborting."; exit 1; }
+command -v qemu-system-x86_64 > /dev/null 2>&1 || { echo >&2 "I require qemu-system-x86 but it's not installed. Install it. Aborting."; exit 1; }
 command -v qemu-img > /dev/null 2>&1 || { echo >&2 "I require qemu-img but it's not installed. Install it. Aborting."; exit 1; }
 command -v vncviewer > /dev/null 2>&1 || { echo >&2 "I require tigervnc but it's not installed. Install it. Aborting."; exit 1; }
 
