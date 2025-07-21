@@ -2,10 +2,9 @@
 
 [ ! -d /sys/firmware/efi ] && echo "System not booted in UEFI mode." && exit 1
 
-command -v netstat > /dev/null 2>&1 || { echo >&2 "I require net-tools but it's not installed. Install it. Aborting."; exit 1; }
 command -v qemu-img > /dev/null 2>&1 || { echo >&2 "I require qemu-img but it's not installed. Install it. Aborting."; exit 1; }
 command -v qemu-system-x86_64 > /dev/null 2>&1 || { echo >&2 "I require qemu-system-x86 but it's not installed. Install it. Aborting."; exit 1; }
-which qemu-ui-sdl > /dev/null 2>&1 || { echo >&2 "I require qemu-ui-sdl but it's not installed. Install it. Aborting."; exit 1; }
+qemu-system-x86_64 -display sdl,gl=on -version >/dev/null 2>&1 || { echo "I require qemu-ui-sdl qemu-ui-opengl but they're not installed. Install them. Aborting."; exit 1; }
 
 usage() {
   echo "Usage: $0 IMAGE"
@@ -20,15 +19,15 @@ fi
 IMAGE="$1"
 
 if [[ "$IMAGE" == *".img" ]] && [[ -f "$IMAGE" ]]; then
-  qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "${IMAGE}" -display sdl,gl=on,window-close=on
+  qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -hda "${IMAGE}"
 elif [[ "$IMAGE" == *".iso" ]] && [[ -f "$IMAGE" ]]; then
   read -p "Enter name for image file (e.g. Arch): " IMAGE_NAME
   read -p "Enter disk size (default: 20G): " DISK && [ ! "$DISK" ] && DISK="20G"
   mkdir -p ./data
   qemu-img create -f qcow2 "./data/${IMAGE_NAME}.img" "$DISK"
-  qemu-system-x86_64 -boot d -cdrom "${IMAGE}" -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "./data/${IMAGE_NAME}.img" -display sdl,gl=on,window-close=on
+  qemu-system-x86_64 -boot d -cdrom "${IMAGE}" -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -hda "./data/${IMAGE_NAME}.img"
 elif [[ "$IMAGE" == *".qcow2" ]] && [[ -f "$IMAGE" ]]; then
-  qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -hda "${IMAGE}" -display sdl,gl=on,window-close=on
+  qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -hda "${IMAGE}"
 else
   usage
 fi
