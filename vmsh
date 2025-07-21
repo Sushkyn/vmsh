@@ -18,16 +18,23 @@ fi
 
 IMAGE="$1"
 
+
 if [[ "$IMAGE" == *".img" ]] && [[ -f "$IMAGE" ]]; then
-  qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -hda "${IMAGE}"
+  for dev in ich9-intel-hda intel-hda ac97 es1370; do
+    qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -audiodev alsa,id=snd0 -device "$dev",audiodev=snd0 -hda "${IMAGE}" && break
+  done
 elif [[ "$IMAGE" == *".iso" ]] && [[ -f "$IMAGE" ]]; then
   read -p "Enter name for image file (e.g. Arch): " IMAGE_NAME
   read -p "Enter disk size (default: 20G): " DISK && [ ! "$DISK" ] && DISK="20G"
   mkdir -p ./data
   qemu-img create -f qcow2 "./data/${IMAGE_NAME}.img" "$DISK"
-  qemu-system-x86_64 -boot d -cdrom "${IMAGE}" -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -hda "./data/${IMAGE_NAME}.img"
+  for dev in ich9-intel-hda intel-hda ac97 es1370; do
+    qemu-system-x86_64 -boot d -cdrom "${IMAGE}" -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -audiodev alsa,id=snd0 -device "$dev",audiodev=snd0 -hda "./data/${IMAGE_NAME}.img" && break
+  done
 elif [[ "$IMAGE" == *".qcow2" ]] && [[ -f "$IMAGE" ]]; then
-  qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -hda "${IMAGE}"
+  for dev in ich9-intel-hda intel-hda ac97 es1370; do
+    qemu-system-x86_64 -bios /usr/share/ovmf/x64/OVMF.4m.fd -m 2048 -smp 4 -cpu host -enable-kvm -net nic -net user -display sdl,gl=on,window-close=on -audiodev alsa,id=snd0 -device "$dev",audiodev=snd0 -hda "${IMAGE}" && break
+  done
 else
   usage
 fi
