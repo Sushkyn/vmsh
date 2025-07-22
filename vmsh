@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 [ ! -d /sys/firmware/efi ] && echo "System not booted in UEFI mode." && exit 1
 
